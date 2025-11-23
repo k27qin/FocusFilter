@@ -1,53 +1,47 @@
-<!--<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Keyboard Color Toggler</title>
-</head>
-
-<body>
-     Content will be added by app.js
-    <script src="app.js"></script>
-</body>
-
-</html> -->
-
-<!--<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="UTF-8">
-    <title>MX Keyboard Effects</title>
-</head>
-
-<body>
-    <h1>MX Creative Console Effects</h1>
-    <button id="connect-btn">Connect to MX</button>
-
-    <p>Press any letter on your keyboard to trigger effects.</p>
-
-    <script type="module" src="app.js"></script>
-</body>
-
-</html>-->
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>MX Creative Console - Module Demo</title>
+    <title>Focus Filter + Chaos</title>
     <style>
+        html,
         body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             font-family: system-ui;
-            background: #1a1a1a;
+            background: #111;
             color: #f0f0f0;
+        }
+
+        h1 {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 2.5rem;
+            z-index: 10;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+        }
+
+        #backgroundCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        .ui-container {
+            position: relative;
+            z-index: 5;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding-top: 120px;
+            /* leave space for h1 */
         }
 
         .grid {
@@ -109,24 +103,83 @@
 
         button {
             transition: opacity 0.2s ease;
+            margin: 5px;
         }
     </style>
 </head>
 
 <body>
     <h1>Focus Filter</h1>
-    <button id="connectBtn">Connect MX Creative</button>
-    <button id="connectMouseBtn">Connect MX Master 4</button>
 
+    <canvas id="backgroundCanvas"></canvas>
 
-    <div class="grid" id="grid"></div>
-    <div class="paging">
-        <div class="page-btn" id="key-9">P1</div>
-        <div class="page-btn" id="key-10">P2</div>
+    <div class="ui-container">
+        <button id="connectBtn">Connect MX Creative</button>
+        <button id="connectMouseBtn">Connect MX Master 4</button>
+
+        <div class="grid" id="grid"></div>
+        <div id="log">Waiting for connection...</div>
     </div>
-    <div id="log">Waiting for connection...</div>
 
-    <script type="module" src="app.js">
+    <script type="module" src="app.js"></script>
+
+    <script>
+        // Full-screen chaotic bouncing circles
+        const canvas = document.getElementById('backgroundCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Circle {
+            constructor() {
+                this.radius = 10 + Math.random() * 40;
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.dx = (Math.random() - 0.5) * 6;
+                this.dy = (Math.random() - 0.5) * 6;
+                this.hue = Math.random() * 360;
+                this.sizePulseRate = Math.random() * 0.05;
+            }
+            update() {
+                this.x += this.dx;
+                this.y += this.dy;
+
+                if (this.x + this.radius > canvas.width || this.x - this.radius < 0) this.dx *= -1;
+                if (this.y + this.radius > canvas.height || this.y - this.radius < 0) this.dy *= -1;
+
+                this.hue += 0.5;
+                this.radius += Math.sin(Date.now() * 0.002 + this.sizePulseRate) * 0.3;
+                if (this.radius < 5) this.radius = 5; // Prevent negative radius
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `hsl(${this.hue}, 80%, 60%)`;
+                ctx.fill();
+            }
+        }
+
+        const circles = [];
+        const numCircles = 50;
+        for (let i = 0; i < numCircles; i++) {
+            circles.push(new Circle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let c of circles) {
+                c.update();
+                c.draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        animate();
     </script>
 </body>
 
