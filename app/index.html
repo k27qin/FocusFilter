@@ -100,12 +100,24 @@
             margin-top: 20px;
             color: #888;
         }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        button {
+            transition: opacity 0.2s ease;
+        }
     </style>
 </head>
 
 <body>
     <h1>Focus Filter</h1>
-    <button id="connectBtn">Connect Device</button>
+    <button id="connectBtn">Connect MX Creative</button>
+    <button id="connectMouseBtn">Connect MX Master 4</button>
+
 
     <div class="grid" id="grid"></div>
     <div class="paging">
